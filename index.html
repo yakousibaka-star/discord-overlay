@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>オーバーレイ</title>
+  <!-- リアルタイム通信用のライブラリを読み込み -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: transparent;
+      font-family: sans-serif;
+    }
+    .box {
+      display: inline-block;
+      padding: 15px 25px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      border-radius: 10px;
+      border-left: 5px solid #5865F2;
+      font-size: 24px;
+      font-weight: bold;
+      opacity: 0; /* 最初は非表示にしておく */
+      transform: translateY(-20px);
+      transition: all 0.5s ease; /* パッと現れるアニメーション */
+    }
+    .box.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="box" id="overlay-card">
+    <span id="name">---</span> さんがボタンを押しました！
+  </div>
+
+  <script>
+    // サーバーと通信接続を確立
+    const socket = io();
+    const card = document.getElementById('overlay-card');
+    const nameEl = document.getElementById('name');
+    let timer = null;
+
+    // サーバーから「ボタンが押された」通知が来たら実行
+    socket.on('user_pressed', (data) => {
+      nameEl.textContent = data.username;
+      card.classList.add('show'); // 画面に表示
+
+      // 5秒後に自動でふわっと消す設定
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        card.classList.remove('show');
+      }, 5000);
+    });
+  </script>
+
+</body>
+</html>
